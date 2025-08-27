@@ -27,7 +27,7 @@
       white-space: nowrap;
       margin-bottom: 20px;
     }
-    #randomButton, #autoplayButton, #multiButton, #unmuteButton {
+    #randomButton, #autoplayButton, #multiButton {
       background: linear-gradient(180deg, 
         rgba(255, 255, 255, 0.9) 0%,
         rgba(255, 255, 255, 0.4) 1%,
@@ -85,15 +85,6 @@
       color: #aaa;
       font-size: 14px;
     }
-    #unmuteButton {
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-    #unmuteButton.show {
-      visibility: visible;
-      opacity: 1;
-    }
   </style>
   <script src="https://www.youtube.com/iframe_api"></script>
 </head>
@@ -103,9 +94,8 @@
 
     <div class="button-container">
       <button id="randomButton">play random video</button>
-      <button id="autoplayButton">start autoplay 5s each</button>
+      <button id="autoplayButton">autoplay 10s each</button>
       <button id="multiButton">play 4 videos</button>
-      <button id="unmuteButton">🔊 unmute all</button>
     </div>
 
     <div id="videoContainer">
@@ -121,7 +111,7 @@
   <script>
     // Your existing videoIds array goes here
     const videoIds = [
-      '3SEI5uXWmVQ',
+           '3SEI5uXWmVQ',
 'gT3fORu93IQ',
 'nfxa858l2xw',
 'UlDqvz23dI4',
@@ -770,6 +760,7 @@
     let isMuted = true;
     let isMultiVideoMode = false;
     let currentVideoIds = []; // Store current 4 video IDs
+    let isMultiVideoMuted = true; // Track mute state for 4-video mode
 
     // YouTube API ready callback
     function onYouTubeIframeAPIReady() {
@@ -798,14 +789,23 @@
           <p id="videoInfo">click to start playing</p>
         </div>
       `;
-      
-      // Hide unmute button
-      const unmuteBtn = document.getElementById('unmuteButton');
-      unmuteBtn.classList.remove('show');
     }
 
     function getRandomVideo() {
       resetToSingleVideoLayout();
+      
+      // Reset autoplay button to single video mode
+      const autoplayBtn = document.getElementById('autoplayButton');
+      if (autoplayMode) {
+        clearInterval(autoplayInterval);
+        autoplayMode = false;
+      }
+      autoplayBtn.textContent = 'autoplay 10s each';
+      
+      // Reset multi button
+      const multiBtn = document.getElementById('multiButton');
+      multiBtn.textContent = 'play 4 videos';
+      
       if (!hasUserInteracted) { hasUserInteracted = true; isMuted = false; }
       let randomIndex;
       do {
@@ -846,9 +846,40 @@
     }
 
     function toggleAutoplay() {
+      const button = document.getElementById('autoplayButton');
+      
+      // If in multi-video mode, handle 4-video autoplay
+      if (isMultiVideoMode) {
+        if (!autoplayMode) {
+          autoplayMode = true;
+          button.textContent = 'stop autoplay 4 videos';
+          autoplaySequence = shuffleArray([...Array(videoIds.length).keys()]);
+          autoplayCurrentIndex = 0;
+          
+          // Start autoplay for 4 videos
+          autoplayInterval = setInterval(() => {
+            autoplayCurrentIndex += 4; // Move by 4 videos each time
+            if (autoplayCurrentIndex >= videoIds.length) {
+              autoplaySequence = shuffleArray([...Array(videoIds.length).keys()]);
+              autoplayCurrentIndex = 0;
+            }
+            
+            // Load next 4 videos
+            loadNext4Videos();
+          }, 10000);
+        } else {
+          autoplayMode = false;
+          button.textContent = 'autoplay 4 videos';
+          clearInterval(autoplayInterval);
+          autoplayInterval = null;
+        }
+        return;
+      }
+
+      // Original single video autoplay logic
       resetToSingleVideoLayout();
       if (!hasUserInteracted) { hasUserInteracted = true; isMuted = false; }
-      const button = document.getElementById('autoplayButton');
+      
       if (!autoplayMode) {
         autoplayMode = true;
         button.textContent = 'stop autoplay';
@@ -862,27 +893,98 @@
             autoplayCurrentIndex = 0;
           }
           loadVideo(autoplaySequence[autoplayCurrentIndex]);
-        }, 5000);
+        }, 10000);
       } else {
         autoplayMode = false;
-        button.textContent = 'start autoplay 5s each';
+        button.textContent = 'start autoplay 10s each';
         clearInterval(autoplayInterval);
         autoplayInterval = null;
       }
     }
 
-    // Improved 4-video function with YouTube Player API
-    function playFourVideos() {
-      // Clear any existing players
-      if (isMultiVideoMode) {
-        ytPlayers.forEach(player => {
-          if (player && player.destroy) {
-            player.destroy();
-          }
-        });
+    function loadNext4Videos() {
+      // Get next 4 unique videos starting from current index
+      let picked = [];
+      if (videoIds.length >= 4) {
+        for (let i = 0; i < 4; i++) {
+          const index = (autoplayCurrentIndex + i) % videoIds.length;
+          picked.push(videoIds[autoplaySequence[index]]);
+        }
+      } else {
+        picked = [...new Set(videoIds)];
       }
+      currentVideoIds = picked;
+
+      // Destroy existing players
+      ytPlayers.forEach(player => {
+        if (player && player.destroy) {
+          player.destroy();
+        }
+      });
       ytPlayers = [];
+
+      const container = document.getElementById('videoContainer');
+      const grid = container.querySelector('.video-grid');
+      
+      // Clear and recreate player containers
+      grid.innerHTML = '';
+      picked.forEach((id, index) => {
+        const playerDiv = document.createElement('div');
+        playerDiv.id = `player-${index}`;
+        playerDiv.className = 'player-container';
+        grid.appendChild(playerDiv);
+      });
+
+      // Update info
+      const infoElement = container.querySelector('.video-info');
+      const muteStatus = isMultiVideoMuted ? 'muted' : 'with sound';
+      infoElement.innerHTML = `<strong>playing 4 videos ${muteStatus}</strong><br>IDs: ${picked.join(', ')}`;
+
+      // Initialize new players
+      setTimeout(() => {
+        picked.forEach((id, index) => {
+          const player = new YT.Player(`player-${index}`, {
+            height: '100%',
+            width: '100%',
+            videoId: id,
+            playerVars: {
+              'autoplay': 1,
+              'mute': isMultiVideoMuted ? 1 : 0,
+              'controls': 1,
+              'rel': 0,
+              'modestbranding': 1,
+              'playsinline': 1
+            }
+          });
+          ytPlayers.push(player);
+        });
+      }, 100);
+    }
+
+    // Multi-video function that also works as mute/unmute
+    function handleMultiButton() {
+      const multiBtn = document.getElementById('multiButton');
+      const autoplayBtn = document.getElementById('autoplayButton');
+
+      // If already in multi-video mode, toggle mute/unmute
+      if (isMultiVideoMode) {
+        toggleMuteAllVideos();
+        return;
+      }
+
+      // Stop single video autoplay if active
+      if (autoplayMode && !isMultiVideoMode) {
+        clearInterval(autoplayInterval);
+        autoplayMode = false;
+      }
+
+      // Switch to multi-video mode
       isMultiVideoMode = true;
+      isMultiVideoMuted = true; // Start muted
+      
+      // Update button texts
+      autoplayBtn.textContent = 'autoplay 4 videos';
+      multiBtn.textContent = '🔊 unmute all';
 
       const container = document.getElementById('videoContainer');
       container.innerHTML = '';
@@ -914,12 +1016,7 @@
       info.innerHTML = `<strong>playing 4 videos muted</strong><br>IDs: ${picked.join(', ')}`;
       container.appendChild(info);
 
-      // Show unmute button
-      const unmuteBtn = document.getElementById('unmuteButton');
-      unmuteBtn.textContent = 'unmute all'; // Reset button text
-      unmuteBtn.classList.add('show');
-
-      // Initialize YouTube players after a short delay
+      // Initialize YouTube players
       setTimeout(() => {
         picked.forEach((id, index) => {
           const player = new YT.Player(`player-${index}`, {
@@ -933,14 +1030,6 @@
               'rel': 0,
               'modestbranding': 1,
               'playsinline': 1
-            },
-            events: {
-              'onReady': (event) => {
-                console.log(`Player ${index} ready`);
-              },
-              'onError': (event) => {
-                console.log(`Player ${index} error:`, event.data);
-              }
             }
           });
           ytPlayers.push(player);
@@ -948,23 +1037,20 @@
       }, 100);
     }
 
-    // Toggle mute/unmute function that doesn't reload videos
+    // Toggle mute/unmute function
     function toggleMuteAllVideos() {
       if (!isMultiVideoMode || ytPlayers.length === 0) return;
 
-      const unmuteBtn = document.getElementById('unmuteButton');
+      const multiBtn = document.getElementById('multiButton');
       const infoElement = document.querySelector('.video-info');
-      const isMutedCurrently = unmuteBtn.textContent.includes('unmute');
 
       ytPlayers.forEach((player, index) => {
         if (player && (player.unMute || player.mute)) {
           try {
-            if (isMutedCurrently) {
+            if (isMultiVideoMuted) {
               player.unMute();
-              console.log(`Unmuted player ${index}`);
             } else {
               player.mute();
-              console.log(`Muted player ${index}`);
             }
           } catch (error) {
             console.log(`Error toggling mute for player ${index}:`, error);
@@ -972,16 +1058,18 @@
         }
       });
 
-      // Update button text and info
-      if (isMutedCurrently) {
-        unmuteBtn.textContent = 'mute again';
-        if (infoElement) {
-          infoElement.innerHTML = `<strong>playing 4 videos with sound</strong><br>IDs: ${currentVideoIds.join(', ')}`;
-        }
-      } else {
-        unmuteBtn.textContent = 'unmute all';
+      // Toggle mute state and update UI
+      isMultiVideoMuted = !isMultiVideoMuted;
+      
+      if (isMultiVideoMuted) {
+        multiBtn.textContent = '🔊 unmute all';
         if (infoElement) {
           infoElement.innerHTML = `<strong>playing 4 videos muted</strong><br>IDs: ${currentVideoIds.join(', ')}`;
+        }
+      } else {
+        multiBtn.textContent = '🔇 mute all';
+        if (infoElement) {
+          infoElement.innerHTML = `<strong>playing 4 videos with sound</strong><br>IDs: ${currentVideoIds.join(', ')}`;
         }
       }
     }
@@ -989,8 +1077,7 @@
     // Event listeners
     document.getElementById('randomButton').addEventListener('click', getRandomVideo);
     document.getElementById('autoplayButton').addEventListener('click', toggleAutoplay);
-    document.getElementById('multiButton').addEventListener('click', playFourVideos);
-    document.getElementById('unmuteButton').addEventListener('click', toggleMuteAllVideos);
+    document.getElementById('multiButton').addEventListener('click', handleMultiButton);
 
     // Initialize first video on load
     window.addEventListener('load', () => {
