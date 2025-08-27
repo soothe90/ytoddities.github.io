@@ -1279,7 +1279,7 @@
       
       // Update button texts
       autoplayBtn.textContent = 'autoplay 4 videos';
-      multiBtn.textContent = '🔊 unmute all';
+      multiBtn.textContent = 'unmute all';
 
       const container = document.getElementById('videoContainer');
       container.innerHTML = '';
@@ -1358,12 +1358,12 @@
       isMultiVideoMuted = !isMultiVideoMuted;
       
       if (isMultiVideoMuted) {
-        multiBtn.textContent = '🔊 unmute all';
+        multiBtn.textContent = 'unmute all';
         if (infoElement) {
           infoElement.innerHTML = `<strong>playing 4 videos muted</strong><br>IDs: ${currentVideoIds.join(', ')}`;
         }
       } else {
-        multiBtn.textContent = '🔇 mute all';
+        multiBtn.textContent = 'mute all';
         if (infoElement) {
           infoElement.innerHTML = `<strong>playing 4 videos with sound</strong><br>IDs: ${currentVideoIds.join(', ')}`;
         }
