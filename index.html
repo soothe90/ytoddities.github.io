@@ -1,198 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>youtube oddities v1.4</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #000000;
-        }
-        
-        .container {
-            background: black;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        
-        h1 {
-            color: #333;
-            margin-bottom: 30px;
-        }
-        
-          #randomButton, #autoplayButton {
-            background: linear-gradient(180deg, 
-                rgba(255, 255, 255, 0.9) 0%,
-                rgba(255, 255, 255, 0.4) 1%,
-                #4a9eff 2%,
-                #3d8bdb 48%,
-                #2e6bb8 52%,
-                #1e4a82 98%,
-                rgba(0, 0, 0, 0.2) 99%,
-                rgba(0, 0, 0, 0.4) 100%
-            );
-            color: rgba(255, 255, 255, 0.8);
-            border: none;
-            padding: 18px 35px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 22px;
-            cursor: pointer;
-            margin: 8px;
-            transition: all 0.15s ease-out;
-            box-shadow: 
-                0 1px 0 rgba(255, 255, 255, 0.8) inset,
-                0 1px 3px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(0, 0, 0, 0.2);
-            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
-            position: relative;
-            border: 1px solid rgba(0, 0, 0, 0.3);
-        }
-        
-        #autoplayButton {
-            background: linear-gradient(180deg, 
-                rgba(255, 255, 255, 0.9) 0%,
-                rgba(255, 255, 255, 0.4) 1%,
-                #7dd87d 2%,
-                #5cb85c 48%,
-                #449d44 52%,
-                #357a35 98%,
-                rgba(0, 0, 0, 0.2) 99%,
-                rgba(0, 0, 0, 0.4) 100%
-            );
-        }
-        
-        #randomButton:hover, #autoplayButton:hover {
-            transform: translateY(-1px);
-            box-shadow: 
-                0 1px 0 rgba(255, 255, 255, 0.9) inset,
-                0 2px 5px rgba(0, 0, 0, 0.4),
-                0 0 0 1px rgba(0, 0, 0, 0.3);
-        }
-        
-        #randomButton:active, #autoplayButton:active {
-            transform: translateY(1px);
-            box-shadow: 
-                0 1px 0 rgba(255, 255, 255, 0.6) inset,
-                0 1px 2px rgba(0, 0, 0, 0.4) inset,
-                0 1px 2px rgba(0, 0, 0, 0.2);
-        }
-        
-        #randomButton:active, #autoplayButton:active {
-            transform: translateY(0);
-        }
-        #videoContainer {
-            margin-top: 20px;
-            position: relative;
-        }
-        
-        #videoFrame {
-            width: 100%;
-            max-width: 800px;
-            height: 450px;
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        
-        .video-info {
-            margin-top: 15px;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .instructions {
-            background: #e8f4fd;
-            border-left: 4px solid #2196f3;
-            padding: 15px;
-            margin-bottom: 20px;
-            text-align: left;
-            border-radius: 4px;
-        }
-        
-        .instructions h3 {
-            margin-top: 0;
-            color: #1976d2;
-        }
-        
-        .instructions code {
-            background: #f0f0f0;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-family: monospace;
-        }
-
-        .autoplay-notice {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 4px;
-            padding: 10px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: #856404;
-        }
-
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            z-index: 10;
-        }
-
-        @media (max-width: 600px) {
-            #videoFrame {
-                height: 250px;
-            }
-            
-            body {
-                padding: 10px;
-            }
-            
-            .container {
-                padding: 20px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>youtube oddities v1.6</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #000000;
+    }
+    .container {
+      background: black;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    h1 {
+      color: #ccc;
+      margin-bottom: 30px;
+    }
+    .button-container {
+      white-space: nowrap;
+      margin-bottom: 20px;
+    }
+    #randomButton, #autoplayButton, #multiButton, #unmuteButton {
+      background: linear-gradient(180deg, 
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(255, 255, 255, 0.4) 1%,
+        #4a9eff 2%,
+        #3d8bdb 48%,
+        #2e6bb8 52%,
+        #1e4a82 98%,
+        rgba(0, 0, 0, 0.2) 99%,
+        rgba(0, 0, 0, 0.4) 100%
+      );
+      color: rgba(255, 255, 255, 0.8);
+      border: none;
+      padding: 18px 35px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 22px;
+      cursor: pointer;
+      margin: 8px;
+      transition: all 0.15s ease-out;
+      box-shadow: 
+        0 1px 0 rgba(255, 255, 255, 0.8) inset,
+        0 1px 3px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(0, 0, 0, 0.2);
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+      position: relative;
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      display: inline-block;
+    }
+    #videoContainer {
+      margin-top: 20px;
+      position: relative;
+    }
+    #videoFrame {
+      width: 100%;
+      max-width: 800px;
+      height: 450px;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    /* Grid for 4 videos */
+    .video-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .video-grid .player-container {
+      width: 100%;
+      height: 250px;
+      border: none;
+      border-radius: 8px;
+    }
+    .video-info {
+      margin-top: 15px;
+      color: #aaa;
+      font-size: 14px;
+    }
+    #unmuteButton {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    #unmuteButton.show {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+  <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>youtube oddities v1.4</h1>
-        
-        
-       
-        <button id="randomButton">play random video</button>
-        <button id="autoplayButton">start autoplay 5s each</button>
-        
-        <div id="videoContainer">
-            <iframe id="videoFrame" src="" allowfullscreen 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
-            </iframe>
-            <div class="loading-overlay" id="loadingOverlay">
-                <div>loading...</div>
-            </div>
-            <div class="video-info">
-                <p id="videoInfo">click to start playing</p>
-            </div>
-        </div>
+  <div class="container">
+    <h1>youtube oddities v1.6</h1>
+
+    <div class="button-container">
+      <button id="randomButton">play random video</button>
+      <button id="autoplayButton">start autoplay 5s each</button>
+      <button id="multiButton">play 4 videos</button>
+      <button id="unmuteButton">🔊 unmute all</button>
     </div>
 
-    <script>
-        // Replace this array with your 600+ YouTube video IDs
-        const videoIds = [
-        '3SEI5uXWmVQ',
+    <div id="videoContainer">
+      <iframe id="videoFrame" src="" allowfullscreen 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+      </iframe>
+      <div class="video-info">
+        <p id="videoInfo">click to start playing</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Your existing videoIds array goes here
+    const videoIds = [
+      '3SEI5uXWmVQ',
 'gT3fORu93IQ',
 'nfxa858l2xw',
 'UlDqvz23dI4',
@@ -829,173 +758,246 @@
 '0jLBgr8tks8',
 '4IGaLTSAHls',
 '1PYdAtuu840'
+    ];
 
-        ];
+    let ytPlayers = []; // Store YouTube Player objects for multi-video mode
+    let currentVideoIndex = -1;
+    let autoplayMode = false;
+    let autoplayInterval = null;
+    let autoplaySequence = [];
+    let autoplayCurrentIndex = 0;
+    let hasUserInteracted = false;
+    let isMuted = true;
+    let isMultiVideoMode = false;
+    let currentVideoIds = []; // Store current 4 video IDs
 
-        let currentVideoIndex = -1;
-        let autoplayMode = false;
-        let autoplayInterval = null;
-        let autoplaySequence = [];
-        let autoplayCurrentIndex = 0;
-        let hasUserInteracted = false;
-        let isMuted = true;
-        
-        function showLoading() {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-        }
-        
-        function hideLoading() {
-            document.getElementById('loadingOverlay').style.display = 'none';
-        }
-        
-        function getRandomVideo() {
-            if (!hasUserInteracted) {
-                hasUserInteracted = true;
-                isMuted = false; // User clicked, so future videos can be unmuted
-            }
-            
-            // Make sure we don't get the same video twice in a row
-            let randomIndex;
-            do {
-                randomIndex = Math.floor(Math.random() * videoIds.length);
-            } while (randomIndex === currentVideoIndex && videoIds.length > 1);
-            
-            currentVideoIndex = randomIndex;
-            loadVideo(randomIndex);
-        }
-        
-        function loadVideo(index) {
-            const videoId = videoIds[index];
-            const iframe = document.getElementById('videoFrame');
-            
-            showLoading();
-            
-            // Build embed URL
-            const baseUrl = 'https://www.youtube.com/embed/';
-            const params = new URLSearchParams({
-                autoplay: hasUserInteracted ? '1' : '0',
-                mute: isMuted ? '1' : '0',
-                controls: '1',
-                rel: '0',
-                modestbranding: '1',
-                playsinline: '1',
-                enablejsapi: '1'
-            });
-            
-            const fullUrl = `${baseUrl}${videoId}?${params.toString()}`;
-            
-            // Force iframe reload by setting src to empty first
-            iframe.src = '';
-            
-            // Small delay to ensure the iframe resets
-            setTimeout(() => {
-                iframe.src = fullUrl;
-                
-                // Hide loading after iframe should have started loading
-                setTimeout(() => {
-                    hideLoading();
-                }, 1000);
-            }, 100);
-            
-            // Update the info
-            const info = document.getElementById('videoInfo');
-            if (autoplayMode) {
-                info.innerHTML = `
-                    <strong>🔄 Autoplay Mode Active</strong><br>
-                    Video ${autoplayCurrentIndex + 1} of ${videoIds.length}<br>
-                    <small>ID: ${videoId} | ${isMuted ? 'Muted' : 'With Sound'}</small>
-                `;
-            } else {
-                info.innerHTML = `
-                    <strong>▶️ Now Playing</strong><br>
-                    Video ${index + 1} of ${videoIds.length}<br>
-                    <small>ID: ${videoId} | ${isMuted ? 'Muted' : 'With Sound'}</small>
-                `;
-            }
-            
-            console.log(`Loading video: ${videoId} (${isMuted ? 'muted' : 'unmuted'})`);
-        }
-        
-        function shuffleArray(array) {
-            const shuffled = [...array];
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-            return shuffled;
-        }
-        
-        function toggleAutoplay() {
-            if (!hasUserInteracted) {
-                hasUserInteracted = true;
-                isMuted = false; // User clicked, enable sound
-            }
-            
-            const button = document.getElementById('autoplayButton');
-            const randomButton = document.getElementById('randomButton');
-            
-            if (!autoplayMode) {
-                // Start autoplay mode
-                autoplayMode = true;
-                button.textContent = 'stop autoplay';
-                button.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
-                randomButton.disabled = true;
-                randomButton.style.opacity = '0.5';
-                
-                // Create shuffled sequence
-                autoplaySequence = shuffleArray([...Array(videoIds.length).keys()]);
-                autoplayCurrentIndex = 0;
-                
-                // Start with first video
-                loadVideo(autoplaySequence[autoplayCurrentIndex]);
-                
-                // Set up timer for subsequent videos
-                autoplayInterval = setInterval(() => {
-                    autoplayCurrentIndex++;
-                    if (autoplayCurrentIndex >= autoplaySequence.length) {
-                        // Reshuffle when we've played all videos
-                        autoplaySequence = shuffleArray([...Array(videoIds.length).keys()]);
-                        autoplayCurrentIndex = 0;
-                    }
-                    loadVideo(autoplaySequence[autoplayCurrentIndex]);
-                }, 5000); // 5 seconds per video
-                
-            } else {
-                // Stop autoplay mode
-                autoplayMode = false;
-                button.textContent = 'restart autoplay';
-                button.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
-                randomButton.disabled = false;
-                randomButton.style.opacity = '1';
-                
-                if (autoplayInterval) {
-                    clearInterval(autoplayInterval);
-                    autoplayInterval = null;
-                }
-                
-                document.getElementById('videoInfo').innerHTML = `
-                    <strong>autoplay stopped</strong><br>
-                    Click "play random video" to continue manually
-                `;
-            }
-        }
-        
-        // Event listeners
-        document.getElementById('randomButton').addEventListener('click', getRandomVideo);
-        document.getElementById('autoplayButton').addEventListener('click', toggleAutoplay);
-        
-        // Initialize with first video (no autoplay)
-        window.addEventListener('load', () => {
-            const firstVideoId = videoIds[0];
-            const iframe = document.getElementById('videoFrame');
-            iframe.src = `https://www.youtube.com/embed/${firstVideoId}?controls=1&rel=0&modestbranding=1`;
-            
-            document.getElementById('videoInfo').innerHTML = `
-                <strong>ready to play</strong><br>
-                click to start<br>
-                <small>ID: ${firstVideoId}</small>
-            `;
+    // YouTube API ready callback
+    function onYouTubeIframeAPIReady() {
+      console.log('YouTube API Ready');
+    }
+
+    // Reset container to single-video layout
+    function resetToSingleVideoLayout() {
+      const container = document.getElementById('videoContainer');
+      // Destroy existing players if in multi-video mode
+      if (isMultiVideoMode) {
+        ytPlayers.forEach(player => {
+          if (player && player.destroy) {
+            player.destroy();
+          }
         });
-    </script>
+        ytPlayers = [];
+      }
+      isMultiVideoMode = false;
+      
+      container.innerHTML = `
+        <iframe id="videoFrame" src="" allowfullscreen
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+        </iframe>
+        <div class="video-info">
+          <p id="videoInfo">click to start playing</p>
+        </div>
+      `;
+      
+      // Hide unmute button
+      const unmuteBtn = document.getElementById('unmuteButton');
+      unmuteBtn.classList.remove('show');
+    }
+
+    function getRandomVideo() {
+      resetToSingleVideoLayout();
+      if (!hasUserInteracted) { hasUserInteracted = true; isMuted = false; }
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * videoIds.length);
+      } while (randomIndex === currentVideoIndex && videoIds.length > 1);
+      currentVideoIndex = randomIndex;
+      loadVideo(randomIndex);
+    }
+
+    function loadVideo(index) {
+      const videoId = videoIds[index];
+      const iframe = document.getElementById('videoFrame');
+      const baseUrl = 'https://www.youtube.com/embed/';
+      const params = new URLSearchParams({
+        autoplay: hasUserInteracted ? '1' : '0',
+        mute: isMuted ? '1' : '0',
+        controls: '1',
+        rel: '0',
+        modestbranding: '1',
+        playsinline: '1'
+      });
+      const fullUrl = `${baseUrl}${videoId}?${params.toString()}`;
+      iframe.src = fullUrl;
+      document.getElementById('videoInfo').innerHTML = `
+        <strong>▶️ Now Playing</strong><br>
+        Video ${index + 1} of ${videoIds.length}<br>
+        <small>ID: ${videoId}</small>
+      `;
+    }
+
+    function shuffleArray(array) {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    function toggleAutoplay() {
+      resetToSingleVideoLayout();
+      if (!hasUserInteracted) { hasUserInteracted = true; isMuted = false; }
+      const button = document.getElementById('autoplayButton');
+      if (!autoplayMode) {
+        autoplayMode = true;
+        button.textContent = 'stop autoplay';
+        autoplaySequence = shuffleArray([...Array(videoIds.length).keys()]);
+        autoplayCurrentIndex = 0;
+        loadVideo(autoplaySequence[autoplayCurrentIndex]);
+        autoplayInterval = setInterval(() => {
+          autoplayCurrentIndex++;
+          if (autoplayCurrentIndex >= autoplaySequence.length) {
+            autoplaySequence = shuffleArray([...Array(videoIds.length).keys()]);
+            autoplayCurrentIndex = 0;
+          }
+          loadVideo(autoplaySequence[autoplayCurrentIndex]);
+        }, 5000);
+      } else {
+        autoplayMode = false;
+        button.textContent = 'start autoplay 5s each';
+        clearInterval(autoplayInterval);
+        autoplayInterval = null;
+      }
+    }
+
+    // Improved 4-video function with YouTube Player API
+    function playFourVideos() {
+      // Clear any existing players
+      if (isMultiVideoMode) {
+        ytPlayers.forEach(player => {
+          if (player && player.destroy) {
+            player.destroy();
+          }
+        });
+      }
+      ytPlayers = [];
+      isMultiVideoMode = true;
+
+      const container = document.getElementById('videoContainer');
+      container.innerHTML = '';
+
+      const grid = document.createElement('div');
+      grid.className = 'video-grid';
+
+      // Get 4 unique videos
+      let picked = [];
+      if (videoIds.length >= 4) {
+        picked = shuffleArray(videoIds).slice(0, 4);
+      } else {
+        picked = [...new Set(videoIds)];
+      }
+      currentVideoIds = picked;
+
+      // Create player containers
+      picked.forEach((id, index) => {
+        const playerDiv = document.createElement('div');
+        playerDiv.id = `player-${index}`;
+        playerDiv.className = 'player-container';
+        grid.appendChild(playerDiv);
+      });
+
+      container.appendChild(grid);
+
+      const info = document.createElement('div');
+      info.className = 'video-info';
+      info.innerHTML = `<strong>🎬 Playing 4 videos (muted)</strong><br>IDs: ${picked.join(', ')}`;
+      container.appendChild(info);
+
+      // Show unmute button
+      const unmuteBtn = document.getElementById('unmuteButton');
+      unmuteBtn.textContent = 'unmute all'; // Reset button text
+      unmuteBtn.classList.add('show');
+
+      // Initialize YouTube players after a short delay
+      setTimeout(() => {
+        picked.forEach((id, index) => {
+          const player = new YT.Player(`player-${index}`, {
+            height: '100%',
+            width: '100%',
+            videoId: id,
+            playerVars: {
+              'autoplay': 1,
+              'mute': 1,
+              'controls': 1,
+              'rel': 0,
+              'modestbranding': 1,
+              'playsinline': 1
+            },
+            events: {
+              'onReady': (event) => {
+                console.log(`Player ${index} ready`);
+              },
+              'onError': (event) => {
+                console.log(`Player ${index} error:`, event.data);
+              }
+            }
+          });
+          ytPlayers.push(player);
+        });
+      }, 100);
+    }
+
+    // Toggle mute/unmute function that doesn't reload videos
+    function toggleMuteAllVideos() {
+      if (!isMultiVideoMode || ytPlayers.length === 0) return;
+
+      const unmuteBtn = document.getElementById('unmuteButton');
+      const infoElement = document.querySelector('.video-info');
+      const isMutedCurrently = unmuteBtn.textContent.includes('unmute');
+
+      ytPlayers.forEach((player, index) => {
+        if (player && (player.unMute || player.mute)) {
+          try {
+            if (isMutedCurrently) {
+              player.unMute();
+              console.log(`Unmuted player ${index}`);
+            } else {
+              player.mute();
+              console.log(`Muted player ${index}`);
+            }
+          } catch (error) {
+            console.log(`Error toggling mute for player ${index}:`, error);
+          }
+        }
+      });
+
+      // Update button text and info
+      if (isMutedCurrently) {
+        unmuteBtn.textContent = 'mute again';
+        if (infoElement) {
+          infoElement.innerHTML = `<strong>🎬 Playing 4 videos (with sound)</strong><br>IDs: ${currentVideoIds.join(', ')}`;
+        }
+      } else {
+        unmuteBtn.textContent = '🔊 unmute all';
+        if (infoElement) {
+          infoElement.innerHTML = `<strong>🎬 Playing 4 videos (muted)</strong><br>IDs: ${currentVideoIds.join(', ')}`;
+        }
+      }
+    }
+
+    // Event listeners
+    document.getElementById('randomButton').addEventListener('click', getRandomVideo);
+    document.getElementById('autoplayButton').addEventListener('click', toggleAutoplay);
+    document.getElementById('multiButton').addEventListener('click', playFourVideos);
+    document.getElementById('unmuteButton').addEventListener('click', toggleMuteAllVideos);
+
+    // Initialize first video on load
+    window.addEventListener('load', () => {
+      const firstVideoId = videoIds[0];
+      const iframe = document.getElementById('videoFrame');
+      iframe.src = `https://www.youtube.com/embed/${firstVideoId}?controls=1&rel=0&modestbranding=1`;
+    });
+  </script>
 </body>
 </html>
