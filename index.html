@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>youtube oddities v3</title>
+    <title>Random YouTube Video Player</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             max-width: 900px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #000000;
+            background-color: #f5f5f5;
         }
         
         .container {
@@ -26,69 +26,38 @@
             margin-bottom: 30px;
         }
         
-    #randomButton, #autoplayButton {
-            background: linear-gradient(180deg, 
-                rgba(255, 255, 255, 0.9) 0%,
-                rgba(255, 255, 255, 0.4) 1%,
-                #4a9eff 2%,
-                #3d8bdb 48%,
-                #2e6bb8 52%,
-                #1e4a82 98%,
-                rgba(0, 0, 0, 0.2) 99%,
-                rgba(0, 0, 0, 0.4) 100%
-            );
-            color: rgba(0, 0, 0, 0.8);
+        #randomButton, #autoplayButton {
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+            color: white;
             border: none;
-            padding: 18px 35px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 22px;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 25px;
             cursor: pointer;
-            margin: 8px;
-            transition: all 0.15s ease-out;
-            box-shadow: 
-                0 1px 0 rgba(255, 255, 255, 0.8) inset,
-                0 1px 3px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(0, 0, 0, 0.2);
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-            position: relative;
-            border: 1px solid rgba(0, 0, 0, 0.3);
+            margin: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         
         #autoplayButton {
-            background: linear-gradient(180deg, 
-                rgba(255, 255, 255, 0.9) 0%,
-                rgba(255, 255, 255, 0.4) 1%,
-                #7dd87d 2%,
-                #5cb85c 48%,
-                #449d44 52%,
-                #357a35 98%,
-                rgba(0, 0, 0, 0.2) 99%,
-                rgba(0, 0, 0, 0.4) 100%
-            );
+            background: linear-gradient(45deg, #4CAF50, #45a049);
         }
         
         #randomButton:hover, #autoplayButton:hover {
-            transform: translateY(-1px);
-            box-shadow: 
-                0 1px 0 rgba(255, 255, 255, 0.9) inset,
-                0 2px 5px rgba(0, 0, 0, 0.4),
-                0 0 0 1px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 0, 0, 0.3);
         }
         
-        #randomButton:active, #autoplayButton:active {
-            transform: translateY(1px);
-            box-shadow: 
-                0 1px 0 rgba(255, 255, 255, 0.6) inset,
-                0 1px 2px rgba(0, 0, 0, 0.4) inset,
-                0 1px 2px rgba(0, 0, 0, 0.2);
+        #autoplayButton:hover {
+            box-shadow: 0 6px 12px rgba(76, 175, 80, 0.3);
         }
         
         #randomButton:active, #autoplayButton:active {
             transform: translateY(0);
         }
+        
         #videoContainer {
             margin-top: 20px;
+            position: relative;
         }
         
         #videoFrame {
@@ -128,13 +97,27 @@
         }
 
         .autoplay-notice {
-            background: #d1ecf1;
-            border: 1px solid #bee5eb;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
             border-radius: 4px;
             padding: 10px;
             margin-bottom: 15px;
             font-size: 14px;
-            color: #0c5460;
+            color: #856404;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            z-index: 10;
         }
 
         @media (max-width: 600px) {
@@ -156,12 +139,30 @@
     <div class="container">
         <h1>🎬 Random YouTube Video Player</h1>
         
-        <button id="randomButton">play random video</button>
-        <button id="autoplayButton">start autoplay 5s each</button>
+        <div class="instructions">
+            <h3>How to add your videos:</h3>
+            <p>1. Right-click this page and select "View Page Source" or "Inspect"</p>
+            <p>2. Find the <code>videoIds</code> array in the JavaScript section</p>
+            <p>3. Replace the example video IDs with your own 600+ video IDs</p>
+            <p><strong>Video ID example:</strong> For <code>https://youtube.com/watch?v=dQw4w9WgXcQ</code>, the ID is <code>dQw4w9WgXcQ</code></p>
+        </div>
+
+        <div class="autoplay-notice">
+            <strong>⚡ Autoplay Info:</strong> Videos will start muted initially (browser requirement). Click once to enable sound for future videos!
+        </div>
+        
+        <button id="randomButton">🎲 Get Random Video</button>
+        <button id="autoplayButton">⏯️ Start Autoplay (5s each)</button>
         
         <div id="videoContainer">
-            <iframe id="videoFrame" src="" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            <iframe id="videoFrame" src="" allowfullscreen 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+            </iframe>
+            <div class="loading-overlay" id="loadingOverlay">
+                <div>Loading new video...</div>
+            </div>
             <div class="video-info">
+                <p id="videoInfo">Click a button above to start watching!</p>
             </div>
         </div>
     </div>
@@ -169,7 +170,7 @@
     <script>
         // Replace this array with your 600+ YouTube video IDs
         const videoIds = [
-         '3SEI5uXWmVQ',
+        '3SEI5uXWmVQ',
 'gT3fORu93IQ',
 'nfxa858l2xw',
 'UlDqvz23dI4',
@@ -806,6 +807,7 @@
 '0jLBgr8tks8',
 '4IGaLTSAHls',
 '1PYdAtuu840'
+
         ];
 
         let currentVideoIndex = -1;
@@ -814,9 +816,21 @@
         let autoplaySequence = [];
         let autoplayCurrentIndex = 0;
         let hasUserInteracted = false;
+        let isMuted = true;
+        
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
         
         function getRandomVideo() {
-            hasUserInteracted = true;
+            if (!hasUserInteracted) {
+                hasUserInteracted = true;
+                isMuted = false; // User clicked, so future videos can be unmuted
+            }
             
             // Make sure we don't get the same video twice in a row
             let randomIndex;
@@ -828,44 +842,56 @@
             loadVideo(randomIndex);
         }
         
-        function loadVideo(index, forceAutoplay = false) {
+        function loadVideo(index) {
             const videoId = videoIds[index];
             const iframe = document.getElementById('videoFrame');
             
-            // Build the embed URL with aggressive autoplay parameters
-            let embedUrl = `https://www.youtube.com/embed/${videoId}?`;
+            showLoading();
             
-            const params = [];
+            // Build embed URL
+            const baseUrl = 'https://www.youtube.com/embed/';
+            const params = new URLSearchParams({
+                autoplay: hasUserInteracted ? '1' : '0',
+                mute: isMuted ? '1' : '0',
+                controls: '1',
+                rel: '0',
+                modestbranding: '1',
+                playsinline: '1',
+                enablejsapi: '1'
+            });
             
-            // Always try autoplay if user has interacted or it's forced
-            if (hasUserInteracted || forceAutoplay) {
-                params.push('autoplay=1');
-            }
+            const fullUrl = `${baseUrl}${videoId}?${params.toString()}`;
             
-            // Additional parameters for better autoplay success
-            params.push('mute=1'); // Start muted for better autoplay success
-            params.push('enablejsapi=1');
-            params.push('origin=' + encodeURIComponent(window.location.origin));
-            params.push('playsinline=1');
-            params.push('controls=1');
-            params.push('rel=0');
-            params.push('modestbranding=1');
+            // Force iframe reload by setting src to empty first
+            iframe.src = '';
             
-            // Add timestamp parameter to force reload
-            params.push('t=' + Date.now());
-            
-            embedUrl += params.join('&');
-            
-            // Set the iframe source
-            iframe.src = embedUrl;
+            // Small delay to ensure the iframe resets
+            setTimeout(() => {
+                iframe.src = fullUrl;
+                
+                // Hide loading after iframe should have started loading
+                setTimeout(() => {
+                    hideLoading();
+                }, 1000);
+            }, 100);
             
             // Update the info
             const info = document.getElementById('videoInfo');
             if (autoplayMode) {
-                info.innerHTML = `🔄 Autoplay Mode: Video ${autoplayCurrentIndex + 1} of ${videoIds.length}<br><small>Video ID: ${videoId}</small>`;
+                info.innerHTML = `
+                    <strong>🔄 Autoplay Mode Active</strong><br>
+                    Video ${autoplayCurrentIndex + 1} of ${videoIds.length}<br>
+                    <small>ID: ${videoId} | ${isMuted ? 'Muted' : 'With Sound'}</small>
+                `;
             } else {
-                info.innerHTML = `▶️ Playing video ${index + 1} of ${videoIds.length}<br><small>Video ID: ${videoId}</small>`;
+                info.innerHTML = `
+                    <strong>▶️ Now Playing</strong><br>
+                    Video ${index + 1} of ${videoIds.length}<br>
+                    <small>ID: ${videoId} | ${isMuted ? 'Muted' : 'With Sound'}</small>
+                `;
             }
+            
+            console.log(`Loading video: ${videoId} (${isMuted ? 'muted' : 'unmuted'})`);
         }
         
         function shuffleArray(array) {
@@ -878,7 +904,11 @@
         }
         
         function toggleAutoplay() {
-            hasUserInteracted = true;
+            if (!hasUserInteracted) {
+                hasUserInteracted = true;
+                isMuted = false; // User clicked, enable sound
+            }
+            
             const button = document.getElementById('autoplayButton');
             const randomButton = document.getElementById('randomButton');
             
@@ -890,22 +920,22 @@
                 randomButton.disabled = true;
                 randomButton.style.opacity = '0.5';
                 
-                // Create a shuffled sequence of all videos
+                // Create shuffled sequence
                 autoplaySequence = shuffleArray([...Array(videoIds.length).keys()]);
                 autoplayCurrentIndex = 0;
                 
-                // Load first video with autoplay
-                loadVideo(autoplaySequence[autoplayCurrentIndex], true);
+                // Start with first video
+                loadVideo(autoplaySequence[autoplayCurrentIndex]);
                 
-                // Set up interval for next videos
+                // Set up timer for subsequent videos
                 autoplayInterval = setInterval(() => {
                     autoplayCurrentIndex++;
                     if (autoplayCurrentIndex >= autoplaySequence.length) {
-                        // Reshuffle and start over
+                        // Reshuffle when we've played all videos
                         autoplaySequence = shuffleArray([...Array(videoIds.length).keys()]);
                         autoplayCurrentIndex = 0;
                     }
-                    loadVideo(autoplaySequence[autoplayCurrentIndex], true);
+                    loadVideo(autoplaySequence[autoplayCurrentIndex]);
                 }, 5000); // 5 seconds per video
                 
             } else {
@@ -921,45 +951,28 @@
                     autoplayInterval = null;
                 }
                 
-                // Update info
-                document.getElementById('videoInfo').innerHTML = '⏹️ Autoplay stopped.<br><small>Click "Get Random Video" to continue manually.</small>';
+                document.getElementById('videoInfo').innerHTML = `
+                    <strong>⏹️ Autoplay Stopped</strong><br>
+                    Click "Get Random Video" to continue manually
+                `;
             }
         }
         
-        // Add event listeners
+        // Event listeners
         document.getElementById('randomButton').addEventListener('click', getRandomVideo);
         document.getElementById('autoplayButton').addEventListener('click', toggleAutoplay);
         
-        // Track user interaction for autoplay permissions
-        document.addEventListener('click', () => {
-            hasUserInteracted = true;
-        });
-        
-        // Attempt to unmute videos after user interaction
-        document.addEventListener('click', function unmuteFix() {
-            if (hasUserInteracted) {
-                // Try to reload current video unmuted after first click
-                setTimeout(() => {
-                    if (currentVideoIndex >= 0) {
-                        const currentSrc = document.getElementById('videoFrame').src;
-                        if (currentSrc.includes('mute=1')) {
-                            const newSrc = currentSrc.replace('mute=1', 'mute=0');
-                            document.getElementById('videoFrame').src = newSrc;
-                        }
-                    }
-                }, 1000);
-                
-                // Remove this listener after first use
-                document.removeEventListener('click', unmuteFix);
-            }
-        });
-        
-        // Load initial video (no autoplay)
+        // Initialize with first video (no autoplay)
         window.addEventListener('load', () => {
-            const iframe = document.getElementById('videoFrame');
             const firstVideoId = videoIds[0];
+            const iframe = document.getElementById('videoFrame');
             iframe.src = `https://www.youtube.com/embed/${firstVideoId}?controls=1&rel=0&modestbranding=1`;
-            document.getElementById('videoInfo').innerHTML = '🎬 Ready to play!<br><small>Click a button above to start.</small>';
+            
+            document.getElementById('videoInfo').innerHTML = `
+                <strong>🎬 Ready to Play!</strong><br>
+                Click a button above to start<br>
+                <small>ID: ${firstVideoId}</small>
+            `;
         });
     </script>
 </body>
