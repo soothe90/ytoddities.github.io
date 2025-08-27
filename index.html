@@ -26,30 +26,40 @@
             margin-bottom: 30px;
         }
         
-        #randomButton, #autoplayButton {
-            background: linear-gradient(45deg, #ff0000, #cc0000);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 25px;
-            cursor: pointer;
-            margin: 10px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        #autoplayButton {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-        }
-        
-        #randomButton:hover, #autoplayButton:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(255, 0, 0, 0.3);
-        }
-        
-        #autoplayButton:hover {
-            box-shadow: 0 6px 12px rgba(76, 175, 80, 0.3);
-        }
+       #randomButton, #autoplayButton {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 25px;
+    cursor: pointer;
+    margin: 10px;
+    transition: all 0.3s ease;
+    background-size: 200% 200%;
+    animation: dreamyShift 4s ease-in-out infinite;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+}
+
+#autoplayButton {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #d299c2 100%);
+    box-shadow: 0 8px 32px rgba(168, 237, 234, 0.3);
+}
+
+@keyframes dreamyShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+#randomButton:hover, #autoplayButton:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+    background-size: 300% 300%;
+}
+
+#autoplayButton:hover {
+    box-shadow: 0 12px 40px rgba(168, 237, 234, 0.4);
+}
         
         #randomButton:active, #autoplayButton:active {
             transform: translateY(0);
