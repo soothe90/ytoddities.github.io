@@ -830,8 +830,8 @@
       const fullUrl = `${baseUrl}${videoId}?${params.toString()}`;
       iframe.src = fullUrl;
       document.getElementById('videoInfo').innerHTML = `
-        <strong>▶️ Now Playing</strong><br>
-        Video ${index + 1} of ${videoIds.length}<br>
+        <strong>now playing</strong><br>
+        playing video ${index + 1} of ${videoIds.length}<br>
         <small>ID: ${videoId}</small>
       `;
     }
@@ -911,7 +911,7 @@
 
       const info = document.createElement('div');
       info.className = 'video-info';
-      info.innerHTML = `<strong>🎬 Playing 4 videos (muted)</strong><br>IDs: ${picked.join(', ')}`;
+      info.innerHTML = `<strong>playing 4 videos muted</strong><br>IDs: ${picked.join(', ')}`;
       container.appendChild(info);
 
       // Show unmute button
@@ -976,12 +976,12 @@
       if (isMutedCurrently) {
         unmuteBtn.textContent = 'mute again';
         if (infoElement) {
-          infoElement.innerHTML = `<strong>🎬 Playing 4 videos (with sound)</strong><br>IDs: ${currentVideoIds.join(', ')}`;
+          infoElement.innerHTML = `<strong>playing 4 videos with sound</strong><br>IDs: ${currentVideoIds.join(', ')}`;
         }
       } else {
-        unmuteBtn.textContent = '🔊 unmute all';
+        unmuteBtn.textContent = 'unmute all';
         if (infoElement) {
-          infoElement.innerHTML = `<strong>🎬 Playing 4 videos (muted)</strong><br>IDs: ${currentVideoIds.join(', ')}`;
+          infoElement.innerHTML = `<strong>playing 4 videos muted</strong><br>IDs: ${currentVideoIds.join(', ')}`;
         }
       }
     }
