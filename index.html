@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Random YouTube Video Player</title>
@@ -96,6 +95,16 @@
             font-family: monospace;
         }
 
+        .autoplay-notice {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #0c5460;
+        }
+
         @media (max-width: 600px) {
             #videoFrame {
                 height: 250px;
@@ -122,14 +131,18 @@
             <p>3. Replace the example video IDs with your own 600+ video IDs</p>
             <p><strong>Video ID example:</strong> For <code>https://youtube.com/watch?v=dQw4w9WgXcQ</code>, the ID is <code>dQw4w9WgXcQ</code></p>
         </div>
+
+        <div class="autoplay-notice">
+            <strong>🚀 Auto-Advancing Player:</strong> Videos will automatically advance to the next one in autoplay mode. First click enables autoplay functionality!
+        </div>
         
         <button id="randomButton">🎲 Get Random Video</button>
         <button id="autoplayButton">⏯️ Start Autoplay (5s each)</button>
         
         <div id="videoContainer">
-            <iframe id="videoFrame" src="" allowfullscreen></iframe>
+            <iframe id="videoFrame" src="" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
             <div class="video-info">
-                <p>Click the button above to load a random video!</p>
+                <p id="videoInfo">Click the button above to load a random video!</p>
             </div>
         </div>
     </div>
@@ -154,8 +167,11 @@
         let autoplayInterval = null;
         let autoplaySequence = [];
         let autoplayCurrentIndex = 0;
+        let hasUserInteracted = false;
         
         function getRandomVideo() {
+            hasUserInteracted = true;
+            
             // Make sure we don't get the same video twice in a row
             let randomIndex;
             do {
@@ -166,19 +182,43 @@
             loadVideo(randomIndex);
         }
         
-        function loadVideo(index) {
+        function loadVideo(index, forceAutoplay = false) {
             const videoId = videoIds[index];
-            
-            // Update the iframe with the new video
             const iframe = document.getElementById('videoFrame');
-            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            
+            // Build the embed URL with aggressive autoplay parameters
+            let embedUrl = `https://www.youtube.com/embed/${videoId}?`;
+            
+            const params = [];
+            
+            // Always try autoplay if user has interacted or it's forced
+            if (hasUserInteracted || forceAutoplay) {
+                params.push('autoplay=1');
+            }
+            
+            // Additional parameters for better autoplay success
+            params.push('mute=1'); // Start muted for better autoplay success
+            params.push('enablejsapi=1');
+            params.push('origin=' + encodeURIComponent(window.location.origin));
+            params.push('playsinline=1');
+            params.push('controls=1');
+            params.push('rel=0');
+            params.push('modestbranding=1');
+            
+            // Add timestamp parameter to force reload
+            params.push('t=' + Date.now());
+            
+            embedUrl += params.join('&');
+            
+            // Set the iframe source
+            iframe.src = embedUrl;
             
             // Update the info
-            const info = document.querySelector('.video-info p');
+            const info = document.getElementById('videoInfo');
             if (autoplayMode) {
-                info.textContent = `Autoplay Mode: Video ${autoplayCurrentIndex + 1} of ${videoIds.length} (${videoId})`;
+                info.innerHTML = `🔄 Autoplay Mode: Video ${autoplayCurrentIndex + 1} of ${videoIds.length}<br><small>Video ID: ${videoId}</small>`;
             } else {
-                info.textContent = `Now playing video ${index + 1} of ${videoIds.length}`;
+                info.innerHTML = `▶️ Playing video ${index + 1} of ${videoIds.length}<br><small>Video ID: ${videoId}</small>`;
             }
         }
         
@@ -192,6 +232,7 @@
         }
         
         function toggleAutoplay() {
+            hasUserInteracted = true;
             const button = document.getElementById('autoplayButton');
             const randomButton = document.getElementById('randomButton');
             
@@ -207,8 +248,8 @@
                 autoplaySequence = shuffleArray([...Array(videoIds.length).keys()]);
                 autoplayCurrentIndex = 0;
                 
-                // Load first video
-                loadVideo(autoplaySequence[autoplayCurrentIndex]);
+                // Load first video with autoplay
+                loadVideo(autoplaySequence[autoplayCurrentIndex], true);
                 
                 // Set up interval for next videos
                 autoplayInterval = setInterval(() => {
@@ -218,8 +259,8 @@
                         autoplaySequence = shuffleArray([...Array(videoIds.length).keys()]);
                         autoplayCurrentIndex = 0;
                     }
-                    loadVideo(autoplaySequence[autoplayCurrentIndex]);
-                }, 5000); // 5 seconds
+                    loadVideo(autoplaySequence[autoplayCurrentIndex], true);
+                }, 5000); // 5 seconds per video
                 
             } else {
                 // Stop autoplay mode
@@ -235,8 +276,7 @@
                 }
                 
                 // Update info
-                const info = document.querySelector('.video-info p');
-                info.textContent = `Autoplay stopped. Click "Get Random Video" to continue manually.`;
+                document.getElementById('videoInfo').innerHTML = '⏹️ Autoplay stopped.<br><small>Click "Get Random Video" to continue manually.</small>';
             }
         }
         
@@ -244,8 +284,37 @@
         document.getElementById('randomButton').addEventListener('click', getRandomVideo);
         document.getElementById('autoplayButton').addEventListener('click', toggleAutoplay);
         
-        // Load a random video when page loads
-        window.addEventListener('load', getRandomVideo);
+        // Track user interaction for autoplay permissions
+        document.addEventListener('click', () => {
+            hasUserInteracted = true;
+        });
+        
+        // Attempt to unmute videos after user interaction
+        document.addEventListener('click', function unmuteFix() {
+            if (hasUserInteracted) {
+                // Try to reload current video unmuted after first click
+                setTimeout(() => {
+                    if (currentVideoIndex >= 0) {
+                        const currentSrc = document.getElementById('videoFrame').src;
+                        if (currentSrc.includes('mute=1')) {
+                            const newSrc = currentSrc.replace('mute=1', 'mute=0');
+                            document.getElementById('videoFrame').src = newSrc;
+                        }
+                    }
+                }, 1000);
+                
+                // Remove this listener after first use
+                document.removeEventListener('click', unmuteFix);
+            }
+        });
+        
+        // Load initial video (no autoplay)
+        window.addEventListener('load', () => {
+            const iframe = document.getElementById('videoFrame');
+            const firstVideoId = videoIds[0];
+            iframe.src = `https://www.youtube.com/embed/${firstVideoId}?controls=1&rel=0&modestbranding=1`;
+            document.getElementById('videoInfo').innerHTML = '🎬 Ready to play!<br><small>Click a button above to start.</small>';
+        });
     </script>
 </body>
 </html>
