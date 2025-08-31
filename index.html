@@ -3,62 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>youtube oddities v1.6</title>
+  <title>youtube oddities</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
       max-width: 900px;
       margin: 0 auto;
       padding: 20px;
-      background-color: #000000;
+      background-color: #000;
     }
     .container {
-      background: black;
+      background: #000;
       border-radius: 12px;
       padding: 30px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       text-align: center;
     }
     h1 {
-      color: #ccc;
-      margin-bottom: 30px;
+      color: #555;
+      margin: 0 0 30px 0;
+      font-size: 18px;
+      font-weight: 400;
     }
-    .button-container {
-      white-space: nowrap;
+    .controls {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
       margin-bottom: 20px;
     }
-    #randomButton, #autoplayButton, #multiButton {
-      background: linear-gradient(180deg, 
-        rgba(255, 255, 255, 0.9) 0%,
-        rgba(255, 255, 255, 0.4) 1%,
-        #4a9eff 2%,
-        #3d8bdb 48%,
-        #2e6bb8 52%,
-        #1e4a82 98%,
-        rgba(0, 0, 0, 0.2) 99%,
-        rgba(0, 0, 0, 0.4) 100%
-      );
-      color: rgba(255, 255, 255, 0.8);
-      border: none;
-      padding: 18px 35px;
-      font-size: 16px;
-      font-weight: 600;
-      border-radius: 22px;
+    .btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.6);
+      padding: 8px 16px;
+      font-size: 12px;
+      border-radius: 4px;
       cursor: pointer;
-      margin: 8px;
-      transition: all 0.15s ease-out;
-      box-shadow: 
-        0 1px 0 rgba(255, 255, 255, 0.8) inset,
-        0 1px 3px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(0, 0, 0, 0.2);
-      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
-      position: relative;
-      border: 1px solid rgba(0, 0, 0, 0.3);
-      display: inline-block;
+      transition: all 0.2s ease;
+      min-width: 60px;
+    }
+    .btn:hover {
+      background: rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.8);
+    }
+    .btn.active {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      border-color: rgba(255,255,255,0.4);
     }
     #videoContainer {
       margin-top: 20px;
-      position: relative;
     }
     #videoFrame {
       width: 100%;
@@ -66,52 +59,52 @@
       height: 450px;
       border: none;
       border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
-    /* Grid for 4 videos */
     .video-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
     .video-grid .player-container {
       width: 100%;
       height: 250px;
-      border: none;
       border-radius: 8px;
     }
     .video-info {
-      margin-top: 15px;
-      color: #aaa;
-      font-size: 14px;
+      margin-top: 12px;
+      color: rgba(255,255,255,0.4);
+      font-size: 11px;
+    }
+    @media (max-width: 600px) {
+      .controls { flex-wrap: wrap; gap: 6px; }
+      .btn { font-size: 11px; padding: 6px 12px; min-width: 50px; }
+      #videoFrame { height: 250px; }
+      .video-grid .player-container { height: 180px; }
     }
   </style>
   <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
   <div class="container">
-    <h1>youtube oddities v1.6</h1>
-
-    <div class="button-container">
-      <button id="randomButton">play random</button>
-      <button id="autoplayButton">auto 10s</button>
-      <button id="multiButton">switch to 4</button>
+    <h1>youtube oddities</h1>
+    <div class="controls">
+      <button id="randomBtn" class="btn">random</button>
+      <button id="autoBtn" class="btn">auto 10s</button>
+      <button id="multiBtn" class="btn">grid</button>
     </div>
-
     <div id="videoContainer">
       <iframe id="videoFrame" src="" allowfullscreen 
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
       </iframe>
       <div class="video-info">
-        <p id="videoInfo">click to start</p>
+        <p id="videoInfo">loading</p>
       </div>
     </div>
   </div>
 
   <script>
-    // Your existing videoIds array goes here
     const videoIds = [
-        '3SEI5uXWmVQ',
+     '3SEI5uXWmVQ',
 'gT3fORu93IQ',
 'nfxa858l2xw',
 'UlDqvz23dI4',
@@ -1041,346 +1034,235 @@
 'dIveVvHKr1I',
 'sDH3d0th-gk',
 'V5HgnHQjLdA'
-
     ];
 
-    let ytPlayers = []; // Store YouTube Player objects for multi-video mode
-    let currentVideoIndex = -1;
-    let autoplayMode = false;
-    let autoplayInterval = null;
-    let autoplaySequence = [];
-    let autoplayCurrentIndex = 0;
-    let hasUserInteracted = false;
-    let isMuted = true;
-    let isMultiVideoMode = false;
-    let currentVideoIds = []; // Store current 4 video IDs
-    let isMultiVideoMuted = true; // Track mute state for 4-video mode
+    let state = {
+      players: [],
+      currentIndex: -1,
+      autoMode: false,
+      multiMode: false,
+      multiMuted: true,
+      interval: null,
+      hasInteracted: false,
+      sequence: []
+    };
 
-    // YouTube API ready callback
-    function onYouTubeIframeAPIReady() {
-      console.log('YouTube API Ready');
+    const ui = {
+      randomBtn: document.getElementById('randomBtn'),
+      autoBtn: document.getElementById('autoBtn'),
+      multiBtn: document.getElementById('multiBtn'),
+      container: document.getElementById('videoContainer'),
+      info: document.getElementById('videoInfo')
+    };
+
+    function createEmbedUrl(videoId, options = {}) {
+      const params = new URLSearchParams({
+        controls: '1',
+        rel: '0',
+        modestbranding: '1',
+        playsinline: '1',
+        start: '5',
+        loop: '1',
+        playlist: videoId,
+        autoplay: options.autoplay || '0',
+        mute: options.mute || '1'
+      });
+      return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
     }
 
-    // Reset container to single-video layout
-    function resetToSingleVideoLayout() {
-      const container = document.getElementById('videoContainer');
-      // Destroy existing players if in multi-video mode
-      if (isMultiVideoMode) {
-        ytPlayers.forEach(player => {
-          if (player && player.destroy) {
-            player.destroy();
-          }
-        });
-        ytPlayers = [];
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
       }
-      isMultiVideoMode = false;
-      
-      container.innerHTML = `
-        <iframe id="videoFrame" src="" allowfullscreen
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
-        </iframe>
-        <div class="video-info">
-          <p id="videoInfo">click to start playing</p>
-        </div>
-      `;
+      return arr;
     }
 
-    function getRandomVideo() {
-      resetToSingleVideoLayout();
-      
-      // Reset autoplay button to single video mode
-      const autoplayBtn = document.getElementById('autoplayButton');
-      if (autoplayMode) {
-        clearInterval(autoplayInterval);
-        autoplayMode = false;
+    function updateInfo(text) {
+      ui.info.textContent = text;
+    }
+
+    function updateButtonLabels() {
+      if (state.multiMode) {
+        ui.multiBtn.textContent = state.multiMuted ? 'unmute' : 'mute';
+      } else {
+        ui.multiBtn.textContent = 'grid';
       }
-      autoplayBtn.textContent = 'auto 10s';
-      
-      // Reset multi button
-      const multiBtn = document.getElementById('multiButton');
-      multiBtn.textContent = 'switch to 4';
-      
-      if (!hasUserInteracted) { hasUserInteracted = true; isMuted = false; }
-      let randomIndex;
-      do {
-        randomIndex = Math.floor(Math.random() * videoIds.length);
-      } while (randomIndex === currentVideoIndex && videoIds.length > 1);
-      currentVideoIndex = randomIndex;
-      loadVideo(randomIndex);
     }
 
-    function loadVideo(index) {
+    function destroyPlayers() {
+      state.players.forEach(player => player?.destroy?.());
+      state.players = [];
+    }
+
+    function resetToSingle() {
+      if (state.multiMode) {
+        destroyPlayers();
+        ui.container.innerHTML = `
+          <iframe id="videoFrame" src="" allowfullscreen 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+          </iframe>
+          <div class="video-info"><p id="videoInfo">loading</p></div>
+        `;
+        ui.info = document.getElementById('videoInfo');
+        state.multiMode = false;
+        ui.multiBtn.classList.remove('active');
+        updateButtonLabels();
+      }
+    }
+
+    function loadSingleVideo(index) {
       const videoId = videoIds[index];
       const iframe = document.getElementById('videoFrame');
-      const baseUrl = 'https://www.youtube.com/embed/';
-      const params = new URLSearchParams({
-  autoplay: hasUserInteracted ? '1' : '0',
-  mute: isMuted ? '1' : '0',
-  controls: '1',
-  rel: '0',
-  modestbranding: '1',
-  playsinline: '1',
-  start: '5'  // ← ADD THIS LINE
-});
-      const fullUrl = `${baseUrl}${videoId}?${params.toString()}`;
-      iframe.src = fullUrl;
-      document.getElementById('videoInfo').innerHTML = `
-        <strong>now playing</strong><br>
-        playing video ${index + 1} of ${videoIds.length}<br>
-        <small>ID: ${videoId}</small>
-      `;
-    }
-
-    function shuffleArray(array) {
-      const shuffled = [...array];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-      return shuffled;
-    }
-
-    function toggleAutoplay() {
-      const button = document.getElementById('autoplayButton');
+      const autoplay = state.hasInteracted ? '1' : '0';
+      const mute = state.hasInteracted ? '0' : '1';
       
-      // If in multi-video mode, handle 4-video autoplay
-      if (isMultiVideoMode) {
-        if (!autoplayMode) {
-          autoplayMode = true;
-          button.textContent = 'stop auto 4';
-          autoplaySequence = shuffleArray([...Array(videoIds.length).keys()]);
-          autoplayCurrentIndex = 0;
-          
-          // Start autoplay for 4 videos
-          autoplayInterval = setInterval(() => {
-            autoplayCurrentIndex += 4; // Move by 4 videos each time
-            if (autoplayCurrentIndex >= videoIds.length) {
-              autoplaySequence = shuffleArray([...Array(videoIds.length).keys()]);
-              autoplayCurrentIndex = 0;
-            }
-            
-            // Load next 4 videos
-            loadNext4Videos();
+      iframe.src = createEmbedUrl(videoId, { autoplay, mute });
+      updateInfo(`${index + 1}/${videoIds.length} · ${videoId}`);
+    }
+
+    function getRandomIndex() {
+      let idx;
+      do {
+        idx = Math.floor(Math.random() * videoIds.length);
+      } while (idx === state.currentIndex && videoIds.length > 1);
+      return idx;
+    }
+
+    function toggleRandom() {
+      if (state.autoMode) toggleAuto();
+      resetToSingle();
+      
+      state.currentIndex = getRandomIndex();
+      state.hasInteracted = true;
+      loadSingleVideo(state.currentIndex);
+    }
+
+    function toggleAuto() {
+      if (state.multiMode) {
+        // Multi-video auto mode
+        if (!state.autoMode) {
+          state.autoMode = true;
+          ui.autoBtn.classList.add('active');
+          state.sequence = shuffle([...Array(videoIds.length).keys()]);
+          state.interval = setInterval(() => {
+            loadMultiVideos();
           }, 10000);
         } else {
-          autoplayMode = false;
-          button.textContent = 'auto 4';
-          clearInterval(autoplayInterval);
-          autoplayInterval = null;
+          state.autoMode = false;
+          ui.autoBtn.classList.remove('active');
+          clearInterval(state.interval);
         }
-        return;
-      }
-
-      // Original single video autoplay logic
-      resetToSingleVideoLayout();
-      if (!hasUserInteracted) { hasUserInteracted = true; isMuted = false; }
-      
-      if (!autoplayMode) {
-        autoplayMode = true;
-        button.textContent = 'stop auto';
-        autoplaySequence = shuffleArray([...Array(videoIds.length).keys()]);
-        autoplayCurrentIndex = 0;
-        loadVideo(autoplaySequence[autoplayCurrentIndex]);
-        autoplayInterval = setInterval(() => {
-          autoplayCurrentIndex++;
-          if (autoplayCurrentIndex >= autoplaySequence.length) {
-            autoplaySequence = shuffleArray([...Array(videoIds.length).keys()]);
-            autoplayCurrentIndex = 0;
-          }
-          loadVideo(autoplaySequence[autoplayCurrentIndex]);
-        }, 10000);
       } else {
-        autoplayMode = false;
-        button.textContent = 'auto 10s';
-        clearInterval(autoplayInterval);
-        autoplayInterval = null;
+        // Single video auto mode
+        resetToSingle();
+        if (!state.autoMode) {
+          state.autoMode = true;
+          state.hasInteracted = true;
+          ui.autoBtn.classList.add('active');
+          state.sequence = shuffle([...Array(videoIds.length).keys()]);
+          state.currentIndex = 0;
+          loadSingleVideo(state.sequence[0]);
+          state.interval = setInterval(() => {
+            state.currentIndex = (state.currentIndex + 1) % state.sequence.length;
+            if (state.currentIndex === 0) state.sequence = shuffle([...Array(videoIds.length).keys()]);
+            loadSingleVideo(state.sequence[state.currentIndex]);
+          }, 10000);
+        } else {
+          state.autoMode = false;
+          ui.autoBtn.classList.remove('active');
+          clearInterval(state.interval);
+        }
       }
     }
 
-    function loadNext4Videos() {
-      // Get next 4 unique videos starting from current index
-      let picked = [];
-      if (videoIds.length >= 4) {
-        for (let i = 0; i < 4; i++) {
-          const index = (autoplayCurrentIndex + i) % videoIds.length;
-          picked.push(videoIds[autoplaySequence[index]]);
-        }
-      } else {
-        picked = [...new Set(videoIds)];
-      }
-      currentVideoIds = picked;
-
-      // Destroy existing players
-      ytPlayers.forEach(player => {
-        if (player && player.destroy) {
-          player.destroy();
-        }
-      });
-      ytPlayers = [];
-
-      const container = document.getElementById('videoContainer');
-      const grid = container.querySelector('.video-grid');
+    function loadMultiVideos() {
+      const picked = shuffle(videoIds).slice(0, Math.min(4, videoIds.length));
       
-      // Clear and recreate player containers
+      destroyPlayers();
+      
+      const grid = ui.container.querySelector('.video-grid');
       grid.innerHTML = '';
-      picked.forEach((id, index) => {
-        const playerDiv = document.createElement('div');
-        playerDiv.id = `player-${index}`;
-        playerDiv.className = 'player-container';
-        grid.appendChild(playerDiv);
-      });
-
-      // Update info
-      const infoElement = container.querySelector('.video-info');
-      const muteStatus = isMultiVideoMuted ? 'muted' : 'with sound';
-      infoElement.innerHTML = `<strong>playing 4 videos ${muteStatus}</strong><br>IDs: ${picked.join(', ')}`;
-
-      // Initialize new players
-      setTimeout(() => {
-        picked.forEach((id, index) => {
-          const player = new YT.Player(`player-${index}`, {
-            height: '100%',
-            width: '100%',
-            videoId: id,
-            playerVars: {
-  'autoplay': 1,
-  'mute': isMultiVideoMuted ? 1 : 0,
-  'controls': 1,
-  'rel': 0,
-  'modestbranding': 1,
-  'playsinline': 1,
-  'start': 5  // ← ADD THIS LINE
-}
-          });
-          ytPlayers.push(player);
-        });
-      }, 100);
-    }
-
-    // Multi-video function that also works as mute/unmute
-    function handleMultiButton() {
-      const multiBtn = document.getElementById('multiButton');
-      const autoplayBtn = document.getElementById('autoplayButton');
-
-      // If already in multi-video mode, toggle mute/unmute
-      if (isMultiVideoMode) {
-        toggleMuteAllVideos();
-        return;
-      }
-
-      // Stop single video autoplay if active
-      if (autoplayMode && !isMultiVideoMode) {
-        clearInterval(autoplayInterval);
-        autoplayMode = false;
-      }
-
-      // Switch to multi-video mode
-      isMultiVideoMode = true;
-      isMultiVideoMuted = true; // Start muted
       
-      // Update button texts
-      autoplayBtn.textContent = 'auto 4';
-      multiBtn.textContent = 'unmute';
-
-      const container = document.getElementById('videoContainer');
-      container.innerHTML = '';
-
-      const grid = document.createElement('div');
-      grid.className = 'video-grid';
-
-      // Get 4 unique videos
-      let picked = [];
-      if (videoIds.length >= 4) {
-        picked = shuffleArray(videoIds).slice(0, 4);
-      } else {
-        picked = [...new Set(videoIds)];
-      }
-      currentVideoIds = picked;
-
-      // Create player containers
-      picked.forEach((id, index) => {
-        const playerDiv = document.createElement('div');
-        playerDiv.id = `player-${index}`;
-        playerDiv.className = 'player-container';
-        grid.appendChild(playerDiv);
+      picked.forEach((id, i) => {
+        const div = document.createElement('div');
+        div.id = `player-${i}`;
+        div.className = 'player-container';
+        grid.appendChild(div);
       });
 
-      container.appendChild(grid);
+      updateInfo(`grid · ${state.multiMuted ? 'muted' : 'sound'} · ${picked.join(' ')}`);
 
-      const info = document.createElement('div');
-      info.className = 'video-info';
-      info.innerHTML = `<strong>playing 4 videos muted</strong><br>IDs: ${picked.join(', ')}`;
-      container.appendChild(info);
-
-      // Initialize YouTube players
       setTimeout(() => {
-        picked.forEach((id, index) => {
-          const player = new YT.Player(`player-${index}`, {
+        picked.forEach((id, i) => {
+          const player = new YT.Player(`player-${i}`, {
             height: '100%',
             width: '100%',
             videoId: id,
             playerVars: {
-  'autoplay': 1,
-  'mute': 1,
-  'controls': 1,
-  'rel': 0,
-  'modestbranding': 1,
-  'playsinline': 1,
-  'start': 5  // ← ADD THIS LINE
-}
-          });
-          ytPlayers.push(player);
-        });
-      }, 100);
-    }
-
-    // Toggle mute/unmute function
-    function toggleMuteAllVideos() {
-      if (!isMultiVideoMode || ytPlayers.length === 0) return;
-
-      const multiBtn = document.getElementById('multiButton');
-      const infoElement = document.querySelector('.video-info');
-
-      ytPlayers.forEach((player, index) => {
-        if (player && (player.unMute || player.mute)) {
-          try {
-            if (isMultiVideoMuted) {
-              player.unMute();
-            } else {
-              player.mute();
+              autoplay: 1,
+              mute: state.multiMuted ? 1 : 0,
+              controls: 1,
+              rel: 0,
+              modestbranding: 1,
+              playsinline: 1,
+              start: 5,
+              loop: 1,
+              playlist: id
             }
-          } catch (error) {
-            console.log(`Error toggling mute for player ${index}:`, error);
-          }
-        }
-      });
+          });
+          state.players.push(player);
+        });
+      }, 100);
+    }
 
-      // Toggle mute state and update UI
-      isMultiVideoMuted = !isMultiVideoMuted;
+    function toggleMulti() {
+      if (state.autoMode && !state.multiMode) toggleAuto();
       
-      if (isMultiVideoMuted) {
-        multiBtn.textContent = 'unmute';
-        if (infoElement) {
-          infoElement.innerHTML = `<strong>playing 4 videos muted</strong><br>IDs: ${currentVideoIds.join(', ')}`;
-        }
+      if (!state.multiMode) {
+        // Switch to multi mode
+        state.multiMode = true;
+        ui.multiBtn.classList.add('active');
+        ui.autoBtn.textContent = 'auto';
+        
+        ui.container.innerHTML = `
+          <div class="video-grid"></div>
+          <div class="video-info"><p id="videoInfo">loading grid</p></div>
+        `;
+        ui.info = document.getElementById('videoInfo');
+        
+        updateButtonLabels();
+        loadMultiVideos();
       } else {
-        multiBtn.textContent = 'mute';
-        if (infoElement) {
-          infoElement.innerHTML = `<strong>playing 4 videos with sound</strong><br>IDs: ${currentVideoIds.join(', ')}`;
-        }
+        // Toggle mute in multi mode
+        state.multiMuted = !state.multiMuted;
+        state.players.forEach(player => {
+          if (player?.mute && player?.unMute) {
+            state.multiMuted ? player.mute() : player.unMute();
+          }
+        });
+        updateButtonLabels();
+        updateInfo(`grid · ${state.multiMuted ? 'muted' : 'sound'}`);
       }
+    }
+
+    function onYouTubeIframeAPIReady() {
+      console.log('YouTube API ready');
     }
 
     // Event listeners
-    document.getElementById('randomButton').addEventListener('click', getRandomVideo);
-    document.getElementById('autoplayButton').addEventListener('click', toggleAutoplay);
-    document.getElementById('multiButton').addEventListener('click', handleMultiButton);
+    ui.randomBtn.addEventListener('click', toggleRandom);
+    ui.autoBtn.addEventListener('click', toggleAuto);
+    ui.multiBtn.addEventListener('click', toggleMulti);
 
-    // Initialize first video on load
+    // Initialize
     window.addEventListener('load', () => {
-      const firstVideoId = videoIds[0];
-      const iframe = document.getElementById('videoFrame');
-      iframe.src = `https://www.youtube.com/embed/${firstVideoId}?controls=1&rel=0&modestbranding=1&start=5`;
+      const idx = Math.floor(Math.random() * videoIds.length);
+      state.currentIndex = idx;
+      document.getElementById('videoFrame').src = createEmbedUrl(videoIds[idx]);
+      updateInfo(`${idx + 1}/${videoIds.length} · ${videoIds[idx]}`);
+      updateButtonLabels();
     });
   </script>
 </body>
